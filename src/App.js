@@ -1,15 +1,55 @@
 import React from "react";
 import "./App.css";
 
+const CalendarHeader = () => (
+  <div className="calendar-header">
+    {[
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ].map((dayLabel) => (
+      <div key={dayLabel} className="calendar-header-day-label">
+        {dayLabel}
+      </div>
+    ))}
+  </div>
+);
+
+const TopBar = () => (
+  <div className="top-bar">
+    <h1>Calendar</h1>
+  </div>
+);
+
 function App() {
   const [isDragging, setIsDragging] = React.useState(false);
-  const [slotRef, setSlotRef] = React.useState(undefined);
+  const [currentSlotRef, setCurrentSlotRef] = React.useState(undefined);
   const [showModal, setShowModal] = React.useState(undefined);
   const [baseY, setBaseY] = React.useState(0);
 
-  const mondayRef = React.useRef();
-  const tuesdayRef = React.useRef();
+  const mondaySlotRef = React.useRef();
+  const tuesdaySlotRef = React.useRef();
+  const wednesdaySlotRef = React.useRef();
+  const thursdaySlotRef = React.useRef();
+  const fridaySlotRef = React.useRef();
+  const saturdaySlotRef = React.useRef();
+  const sundaySlotRef = React.useRef();
+
   const modalRef = React.useRef();
+
+  const daySlotRefs = [
+    mondaySlotRef,
+    tuesdaySlotRef,
+    wednesdaySlotRef,
+    thursdaySlotRef,
+    fridaySlotRef,
+    saturdaySlotRef,
+    sundaySlotRef,
+  ];
 
   const handleDrag = (e) => {
     if (!isDragging) return;
@@ -17,57 +57,53 @@ function App() {
     const meetingDuration = e.clientY - baseY - ((e.clientY - baseY) % 25);
 
     if (meetingDuration > 0)
-      slotRef.current.style.height = `${meetingDuration}px`;
+      currentSlotRef.current.style.height = `${meetingDuration}px`;
     else {
-      slotRef.current.style.top = `${baseY + meetingDuration}px`;
-      slotRef.current.style.height = `${-meetingDuration}px`;
+      currentSlotRef.current.style.top = `${baseY + meetingDuration}px`;
+      currentSlotRef.current.style.height = `${-meetingDuration}px`;
     }
   };
 
+  const CalendarDay = ({ daySlotRef }) => (
+    <div
+      className="calendar-day"
+      onPointerDown={(e) => {
+        setCurrentSlotRef(daySlotRef);
+        setBaseY(e.clientY - (e.clientY % 25));
+        daySlotRef.current.style.top = `${e.clientY - (e.clientY % 25)}px`;
+      }}
+    >
+      <div className="calendar-slot" ref={daySlotRef} />
+    </div>
+  );
+
   return (
     <>
-      <div className="top-bar">Calendar</div>
+      <TopBar />
+      <CalendarHeader />
       <div
         className="calendar"
         onPointerMove={(e) => handleDrag(e)}
         onPointerDown={(e) => setIsDragging(true)}
         onPointerUp={(e) => {
           setIsDragging(false);
-          const meetingDuration = e.clientY - baseY - ((e.clientY - baseY) % 25);
-          console.log(`Slot starting height: ${slotRef.current.offsetTop}px`);
-          console.log(`Slot height: ${slotRef.current.style.height}`);
+          const meetingDuration =
+            e.clientY - baseY - ((e.clientY - baseY) % 25);
+          console.log(
+            `Slot starting height: ${currentSlotRef.current.offsetTop}px`
+          );
+          console.log(`Slot height: ${currentSlotRef.current.style.height}`);
           if (Math.abs(meetingDuration) > 25) setShowModal(true);
         }}
         onPointerLeave={(e) => {
           setIsDragging(false);
-          if (slotRef && !showModal) {
-            slotRef.current.style.height = 0;
-            setSlotRef(undefined);
+          if (currentSlotRef && !showModal) {
+            currentSlotRef.current.style.height = 0;
+            setCurrentSlotRef(undefined);
           }
         }}
       >
-        <div
-          className="calendar-day"
-          onPointerDown={(e) => {
-            setSlotRef(mondayRef);
-            setBaseY(e.clientY - e.clientY % 25);
-            mondayRef.current.style.top = `${e.clientY}px`;
-          }}
-        >
-          Monday
-          <div className="calendar-slot" ref={mondayRef}></div>
-        </div>
-        <div
-          className="calendar-day"
-          onPointerDown={(e) => {
-            setSlotRef(tuesdayRef);
-            setBaseY(e.clientY - e.clientY % 25);
-            tuesdayRef.current.style.top = `${e.clientY}px`;
-          }}
-        >
-          Tuesday
-          <div className="calendar-slot" ref={tuesdayRef} />
-        </div>
+        {daySlotRefs.map((daySlotRef, index) => <CalendarDay key={index} daySlotRef={daySlotRef} />)}
       </div>
       {showModal && (
         <div className="modal-container" ref={modalRef}>
@@ -78,9 +114,9 @@ function App() {
                 onClick={() => {
                   alert("Call Zoom");
                   setShowModal(false);
-                  if (slotRef) {
-                    slotRef.current.style.height = "0px";
-                    setSlotRef(undefined);
+                  if (currentSlotRef) {
+                    currentSlotRef.current.style.height = "0px";
+                    setCurrentSlotRef(undefined);
                   }
                 }}
               >
@@ -89,9 +125,9 @@ function App() {
               <button
                 onClick={() => {
                   setShowModal(false);
-                  if (slotRef) {
-                    slotRef.current.style.height = "0px";
-                    setSlotRef(undefined);
+                  if (currentSlotRef) {
+                    currentSlotRef.current.style.height = "0px";
+                    setCurrentSlotRef(undefined);
                   }
                 }}
               >
