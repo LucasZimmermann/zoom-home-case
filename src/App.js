@@ -1,6 +1,20 @@
 import React from "react";
 import "./App.css";
 
+const MINIMUM_SLOT_DURATION = 15;
+const MINUTES_IN_DAY = 24 * 60;
+
+const convertSlotHeightInPxToMin = (heightInPx) =>
+  Number(heightInPx.replace("px", ""));
+
+const computedDate = (weekDayNumber, minutes) => {
+  const date = new Date("2023-01-02");
+  date.setHours(0);
+  date.setMinutes(minutes + weekDayNumber * MINUTES_IN_DAY);
+
+  return date;
+};
+
 const CalendarHeader = () => (
   <div className="calendar-header">
     {[
@@ -25,9 +39,35 @@ const TopBar = () => (
   </div>
 );
 
+const CalendarHours = () => {
+  const hours = 24;
+  return [...Array(hours)].map((hour, index) => (
+    <div key={index} className="calendar-hour">
+      <div className="calendar-hour-subdivision" />
+      <div className="calendar-hour-subdivision" />
+      <div className="calendar-hour-subdivision" />
+      <div className="calendar-hour-subdivision" />
+    </div>
+  ));
+};
+
+const CalendarHourLabels = () => {
+  const hours = 24;
+  return (
+    <div className="calendar-hour-labels-container">
+      {[...Array(hours)].map((hour, index) => (
+        <div key={index} className="calendar-hour-label">
+          {`${index}H00`}
+        </div>
+      ))}
+    </div>
+  );
+};
+
 function App() {
   const [isDragging, setIsDragging] = React.useState(false);
   const [currentSlotRef, setCurrentSlotRef] = React.useState(undefined);
+  const [slotWeekDayNumber, setSlotWeekDayNumber] = React.useState(undefined);
   const [showModal, setShowModal] = React.useState(undefined);
   const [baseY, setBaseY] = React.useState(0);
 
@@ -39,7 +79,7 @@ function App() {
   const saturdaySlotRef = React.useRef();
   const sundaySlotRef = React.useRef();
 
-  const modalRef = React.useRef();
+  const calendarRef = React.useRef();
 
   const daySlotRefs = [
     mondaySlotRef,
@@ -54,7 +94,9 @@ function App() {
   const handleDrag = (e) => {
     if (!isDragging) return;
 
-    const meetingDuration = e.clientY - baseY - ((e.clientY - baseY) % 25);
+    const relativeY = e.pageY - calendarRef.current.offsetTop;
+    const meetingDuration =
+      relativeY - baseY - ((relativeY - baseY) % MINIMUM_SLOT_DURATION);
 
     if (meetingDuration > 0)
       currentSlotRef.current.style.height = `${meetingDuration}px`;
@@ -64,74 +106,89 @@ function App() {
     }
   };
 
-  const CalendarDay = ({ daySlotRef }) => (
+  const CalendarDay = ({ daySlotRef, weekDayNumber }) => (
     <div
       className="calendar-day"
       onPointerDown={(e) => {
+        setIsDragging(true);
         setCurrentSlotRef(daySlotRef);
-        setBaseY(e.clientY - (e.clientY % 25));
-        daySlotRef.current.style.top = `${e.clientY - (e.clientY % 25)}px`;
+        const relativeY = e.pageY - calendarRef.current.offsetTop;
+        const computedBaseY = relativeY - (relativeY % MINIMUM_SLOT_DURATION);
+        daySlotRef.current.style.top = `${computedBaseY}px`;
+        setSlotWeekDayNumber(weekDayNumber);
+        setBaseY(computedBaseY);
       }}
     >
+      <CalendarHours />
       <div className="calendar-slot" ref={daySlotRef} />
     </div>
   );
+
+  console.log(baseY);
 
   return (
     <>
       <TopBar />
       <CalendarHeader />
-      <div
-        className="calendar"
-        onPointerMove={(e) => handleDrag(e)}
-        onPointerDown={(e) => setIsDragging(true)}
-        onPointerUp={(e) => {
-          setIsDragging(false);
-          const meetingDuration =
-            e.clientY - baseY - ((e.clientY - baseY) % 25);
-          console.log(
-            `Slot starting height: ${currentSlotRef.current.offsetTop}px`
-          );
-          console.log(`Slot height: ${currentSlotRef.current.style.height}`);
-          if (Math.abs(meetingDuration) > 25) setShowModal(true);
-        }}
-        onPointerLeave={(e) => {
-          setIsDragging(false);
-          if (currentSlotRef && !showModal) {
-            currentSlotRef.current.style.height = 0;
-            setCurrentSlotRef(undefined);
-          }
-        }}
-      >
-        {daySlotRefs.map((daySlotRef, index) => <CalendarDay key={index} daySlotRef={daySlotRef} />)}
+      <div className="calendar-container">
+        <CalendarHourLabels />
+        <div
+          ref={calendarRef}
+          className="calendar"
+          onPointerMove={(e) => handleDrag(e)}
+          onPointerUp={(e) => {
+            setIsDragging(false);
+            console.log(
+              `Slot starting in minutes: ${currentSlotRef.current.offsetTop}`
+            );
+            console.log(
+              `Slot duration in minutes: ${currentSlotRef.current.style.height}`
+            );
+            setShowModal(true);
+          }}
+          onPointerLeave={(e) => setIsDragging(false)}
+        >
+          {daySlotRefs.map((daySlotRef, index) => (
+            <CalendarDay
+              key={index}
+              daySlotRef={daySlotRef}
+              weekDayNumber={index}
+            />
+          ))}
+        </div>
       </div>
       {showModal && (
-        <div className="modal-container" ref={modalRef}>
+        <div className="modal-container">
           <div className="modal">
-            <div>Modal with meeting info</div>
-            <div style={{ display: "flex", justifyContent: "space-evenly" }}>
+            <h2>Set up a meeting on Zoom</h2>
+            <div className="modal-body">
+              <h4>{`Starts at: ${computedDate(slotWeekDayNumber, baseY)}`}</h4>
+              <h4>{`Ends at: ${computedDate(
+                slotWeekDayNumber,
+                baseY +
+                  convertSlotHeightInPxToMin(
+                    currentSlotRef.current.style.height
+                  ) +
+                  MINIMUM_SLOT_DURATION
+              )}`}</h4>
+            </div>
+            <div className="modal-button-container">
               <button
+                className="modal-button"
                 onClick={() => {
                   alert("Call Zoom");
                   setShowModal(false);
-                  if (currentSlotRef) {
-                    currentSlotRef.current.style.height = "0px";
-                    setCurrentSlotRef(undefined);
-                  }
                 }}
               >
-                Valider
+                Confirm
               </button>
               <button
+                className="modal-button"
                 onClick={() => {
                   setShowModal(false);
-                  if (currentSlotRef) {
-                    currentSlotRef.current.style.height = "0px";
-                    setCurrentSlotRef(undefined);
-                  }
                 }}
               >
-                Annuler
+                Cancel
               </button>
             </div>
           </div>
