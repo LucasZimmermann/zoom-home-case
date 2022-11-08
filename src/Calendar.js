@@ -1,5 +1,5 @@
 import React from "react";
-import ConfirmationModal from "./ConfirmationModal";
+import CreateMeetingModal from "./CreateMeetingModal";
 import { WEEK_DAY_LABELS } from "./utils/constants";
 import {
   computeSlotDurationInMin,
@@ -81,14 +81,14 @@ const CalendarHourLabels = () => {
 };
 
 const Calendar = React.forwardRef(
-  ({ children, setShowConfirmationModal, setIsDragging, handleDrag }, ref) => (
+  ({ children, setShowCreateMeetingModal, setIsDragging, handleDrag }, ref) => (
     <div
       ref={ref}
       className="calendar"
       onPointerMove={(e) => handleDrag(e)}
       onPointerUp={() => {
         setIsDragging(false);
-        setShowConfirmationModal(true);
+        setShowCreateMeetingModal(true);
       }}
       onPointerLeave={() => {
         setIsDragging(false);
@@ -103,7 +103,7 @@ function App() {
   const [isDragging, setIsDragging] = React.useState(false);
   const [currentSlotRef, setCurrentSlotRef] = React.useState(undefined);
   const [slotWeekDayNumber, setSlotWeekDayNumber] = React.useState(undefined);
-  const [showConfirmationModal, setShowConfirmationModal] =
+  const [showCreateMeetingModal, setShowCreateMeetingModal] =
     React.useState(undefined);
   const [slotBaseCalendarYPos, setSlotBaseCalendarYPos] = React.useState(0);
 
@@ -151,7 +151,7 @@ function App() {
         <CalendarHourLabels />
         <Calendar
           ref={calendarRef}
-          setShowConfirmationModal={setShowConfirmationModal}
+          setShowCreateMeetingModal={setShowCreateMeetingModal}
           setIsDragging={setIsDragging}
           handleDrag={handleDrag}
         >
@@ -169,12 +169,12 @@ function App() {
           ))}
         </Calendar>
       </div>
-      {showConfirmationModal && (
-        <ConfirmationModal
+      {showCreateMeetingModal && (
+        <CreateMeetingModal
           slotWeekDayNumber={slotWeekDayNumber}
           slotBaseCalendarYPos={slotBaseCalendarYPos}
           currentSlotRef={currentSlotRef}
-          setShowConfirmationModal={setShowConfirmationModal}
+          setShowCreateMeetingModal={setShowCreateMeetingModal}
           setCurrentSlotRef={setCurrentSlotRef}
         />
       )}

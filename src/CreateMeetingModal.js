@@ -5,12 +5,12 @@ import {
   convertSlotHeightInPxToMin,
 } from "./utils/calendarHelper";
 import { createZoomMeeting } from "./utils/zoom";
-import "./ConfirmationModal.css"
+import "./CreateMeetingModal.css"
 
-const ConfirmationModal = ({
+const CreateMeetingModal = ({
   slotWeekDayNumber,
   currentSlotRef,
-  setShowConfirmationModal,
+  setshowCreateMeetingModal,
   setCurrentSlotRef,
 }) => {
   const slotStartDate = computeSlotStartDate(slotWeekDayNumber, currentSlotRef);
@@ -33,7 +33,7 @@ const ConfirmationModal = ({
                 slotStartDate,
                 slotDuration
               );
-              setShowConfirmationModal(false);
+              setshowCreateMeetingModal(false);
             }}
           >
             Confirm
@@ -41,7 +41,7 @@ const ConfirmationModal = ({
           <button
             className="modal-button"
             onClick={() => {
-              setShowConfirmationModal(false);
+              setshowCreateMeetingModal(false);
               currentSlotRef.current.style.height = "0px";
               setCurrentSlotRef(undefined);
             }}
@@ -54,4 +54,4 @@ const ConfirmationModal = ({
   );
 };
 
-export default ConfirmationModal;
+export default CreateMeetingModal;
