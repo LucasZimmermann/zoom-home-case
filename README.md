@@ -3,13 +3,22 @@
 Iterations:
 
 1) POC ([PR](https://github.com/LucasZimmermann/zoom-home-case/commit/45cd18e58acfdb263ca980a6090711bfb657878d))
+
+
+
 ![ezgif-1-0db017c8ea](https://user-images.githubusercontent.com/65349510/200443216-fc8ac1b6-b77c-4643-aec9-76b6d5925629.gif)
 
 2) Calendar format ([PR](https://github.com/LucasZimmermann/zoom-home-case/commit/fe2b8bb7f2b97392e06109ae90c3d38978cc6188))
+
+
+
 <img width="1452" alt="Screenshot 2022-11-07 at 23 02 27" src="https://user-images.githubusercontent.com/65349510/200443314-f3b13deb-9c97-48a7-87c1-4eca73f0c5af.png">
 
 
 3) Working with logic ([PR](https://github.com/LucasZimmermann/zoom-home-case/commit/2d9a1d2f1ab03514d860ffa0ac403b8a134e918d))
+
+
+
 ![ezgif-1-0db017c8ea](https://user-images.githubusercontent.com/65349510/200443281-f28a19be-2ff0-42b8-83a7-88d603532df1.gif)
 
 
