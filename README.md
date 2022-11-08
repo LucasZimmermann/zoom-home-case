@@ -19,7 +19,9 @@ Iterations:
 
 
 
-![ezgif-1-0db017c8ea](https://user-images.githubusercontent.com/65349510/200443281-f28a19be-2ff0-42b8-83a7-88d603532df1.gif)
+
+![ezgif-1-d55fa76253](https://user-images.githubusercontent.com/65349510/200443551-f28806e4-af40-424b-a82a-f7439fe94f4c.gif)
+
 
 
 # Getting Started with Create React App
