@@ -124,8 +124,6 @@ function App() {
     </div>
   );
 
-  console.log(baseY);
-
   return (
     <>
       <TopBar />
