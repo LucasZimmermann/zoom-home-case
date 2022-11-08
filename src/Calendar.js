@@ -1,17 +1,12 @@
 import React from "react";
-import "./Calendar.css";
-
-import { createZoomMeeting } from "./utils/zoom";
+import ConfirmationModal from "./ConfirmationModal";
 import { WEEK_DAY_LABELS } from "./utils/constants";
 import {
   computeSlotDurationInMin,
-  computeDateFromSlot,
   computeYPosRelativeToCalendar,
   modifySlotPositionAndHeight,
 } from "./utils/calendarHelper";
-
-const convertSlotHeightInPxToMin = (heightInPx) =>
-  Number(heightInPx.replace("px", ""));
+import "./Calendar.css";
 
 const TopBar = () => (
   <div className="top-bar">
@@ -140,7 +135,7 @@ function App() {
       e.pageY,
       calendarRef.current.offsetTop
     );
-    
+
     modifySlotPositionAndHeight(
       meetingDuration,
       currentSlotRef,
@@ -175,53 +170,13 @@ function App() {
         </Calendar>
       </div>
       {showConfirmationModal && (
-        <div className="modal-container">
-          <div className="modal">
-            <h2>Set up a meeting on Zoom</h2>
-            <div className="modal-body">
-              <h4>{`Starts at: ${computeDateFromSlot(
-                slotWeekDayNumber,
-                slotBaseCalendarYPos
-              )}`}</h4>
-              <h4>{`Ends at: ${computeDateFromSlot(
-                slotWeekDayNumber,
-                slotBaseCalendarYPos +
-                  convertSlotHeightInPxToMin(
-                    currentSlotRef.current.style.height
-                  )
-              )}`}</h4>
-            </div>
-            <div className="modal-button-container">
-              <button
-                className="modal-button"
-                onClick={async () => {
-                  await createZoomMeeting(
-                    computeDateFromSlot(
-                      slotWeekDayNumber,
-                      slotBaseCalendarYPos
-                    ),
-                    convertSlotHeightInPxToMin(
-                      currentSlotRef.current.style.height
-                    )
-                  );
-                  setShowConfirmationModal(false);
-                }}
-              >
-                Confirm
-              </button>
-              <button
-                className="modal-button"
-                onClick={() => {
-                  setShowConfirmationModal(false);
-                  currentSlotRef.current.style.height = "0px";
-                  setCurrentSlotRef(undefined);
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfirmationModal
+          slotWeekDayNumber={slotWeekDayNumber}
+          slotBaseCalendarYPos={slotBaseCalendarYPos}
+          currentSlotRef={currentSlotRef}
+          setShowConfirmationModal={setShowConfirmationModal}
+          setCurrentSlotRef={setCurrentSlotRef}
+        />
       )}
     </>
   );

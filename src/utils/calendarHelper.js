@@ -26,12 +26,28 @@ export const computeYPosRelativeToCalendar = (yPos, calendarRef) => {
   return relativeTopSlotYpos - (relativeTopSlotYpos % MINIMUM_SLOT_DURATION);
 };
 
-export const computeDateFromSlot = (weekDayNumber, minutes) => {
+export const convertSlotHeightInPxToMin = (heightInPx) =>
+  Number(heightInPx.replace("px", ""));
+
+export const computeSlotStartDate = (slotWeekDayNumber, currentSlotRef) => {
   const date = new Date(BASE_DATE_UTC);
   date.setHours(0);
-  date.setMinutes(minutes + weekDayNumber * MINUTES_IN_DAY);
+  const timeOffsetInMin =
+    convertSlotHeightInPxToMin(currentSlotRef.current.style.top) +
+    slotWeekDayNumber * MINUTES_IN_DAY;
+
+  date.setMinutes(timeOffsetInMin);
 
   return date;
+};
+
+export const computeSlotEndDate = (slotStartDate, currentSlotRef) => {
+  const endDate = new Date(slotStartDate);
+  endDate.setMinutes(
+    convertSlotHeightInPxToMin(currentSlotRef.current.style.height)
+  );
+
+  return endDate;
 };
 
 export const modifySlotPositionAndHeight = (
@@ -43,10 +59,10 @@ export const modifySlotPositionAndHeight = (
     currentSlotRef.current.style.height = `${meetingDuration}px`;
   else {
     currentSlotRef.current.style.top = `${
-      slotBaseCalendarYPos + meetingDuration - MINIMUM_SLOT_DURATION
+      slotBaseCalendarYPos + meetingDuration - 2 * MINIMUM_SLOT_DURATION
     }px`;
     currentSlotRef.current.style.height = `${
-      -meetingDuration + 2 * MINIMUM_SLOT_DURATION
+      -meetingDuration + 3 * MINIMUM_SLOT_DURATION
     }px`;
   }
 };
