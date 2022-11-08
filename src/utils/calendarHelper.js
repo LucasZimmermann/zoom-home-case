@@ -50,6 +50,9 @@ export const computeSlotEndDate = (slotStartDate, currentSlotRef) => {
   return endDate;
 };
 
+export const formatToReadableDate = (date) =>
+  `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+
 export const modifySlotPositionAndHeight = (
   meetingDuration,
   currentSlotRef,

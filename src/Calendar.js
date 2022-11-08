@@ -1,6 +1,7 @@
 import React from "react";
 import CreateMeetingModal from "./CreateMeetingModal";
-import { WEEK_DAY_LABELS } from "./utils/constants";
+import ConfirmationModal from "./ConfirmationModal";
+import { WEEK_DAY_LABELS, MEETING_PENDING_COLOUR } from "./utils/constants";
 import {
   computeSlotDurationInMin,
   computeYPosRelativeToCalendar,
@@ -42,6 +43,7 @@ const CalendarDay = React.forwardRef(
         setIsDragging(true);
         setCurrentSlotRef(ref);
         setSlotWeekDayNumber(weekDayNumber);
+        ref.current.style.background = MEETING_PENDING_COLOUR
         const slotYPos = computeYPosRelativeToCalendar(e.pageY, calendarRef);
         ref.current.style.top = `${slotYPos}px`;
         setSlotBaseCalendarYPos(slotYPos);
@@ -101,6 +103,7 @@ const Calendar = React.forwardRef(
 
 function App() {
   const [isDragging, setIsDragging] = React.useState(false);
+  const [zoomMeetingData, setZoomMeetingData] = React.useState(null);
   const [currentSlotRef, setCurrentSlotRef] = React.useState(undefined);
   const [slotWeekDayNumber, setSlotWeekDayNumber] = React.useState(undefined);
   const [showCreateMeetingModal, setShowCreateMeetingModal] =
@@ -172,10 +175,17 @@ function App() {
       {showCreateMeetingModal && (
         <CreateMeetingModal
           slotWeekDayNumber={slotWeekDayNumber}
-          slotBaseCalendarYPos={slotBaseCalendarYPos}
           currentSlotRef={currentSlotRef}
           setShowCreateMeetingModal={setShowCreateMeetingModal}
+          showCreateMeetingModal={showCreateMeetingModal}
           setCurrentSlotRef={setCurrentSlotRef}
+          setZoomMeetingData={setZoomMeetingData}
+        />
+      )}
+      {Boolean(zoomMeetingData) && (
+        <ConfirmationModal
+          zoomMeetingData={zoomMeetingData}
+          setZoomMeetingData={setZoomMeetingData}
         />
       )}
     </>

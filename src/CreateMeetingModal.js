@@ -3,54 +3,72 @@ import {
   computeSlotStartDate,
   computeSlotEndDate,
   convertSlotHeightInPxToMin,
+  formatToReadableDate,
 } from "./utils/calendarHelper";
 import { createZoomMeeting } from "./utils/zoom";
-import "./CreateMeetingModal.css"
+import { MEETING_CONFIRMED_COLOUR } from "./utils/constants";
+import "./CreateMeetingModal.css";
+
+const ModalButtonGroup = ({ onConfirm, onCancel }) => (
+  <div className="modal-button-container">
+    <button className="modal-button" onClick={onConfirm}>
+      Confirm
+    </button>
+    <button className="modal-button" onClick={onCancel}>
+      Cancel
+    </button>
+  </div>
+);
+
+export const Modal = ({ children, title }) => (
+  <div className="modal-container">
+    <div className="modal">
+      <h2>{title}</h2>
+      {children}
+    </div>
+  </div>
+);
 
 const CreateMeetingModal = ({
   slotWeekDayNumber,
   currentSlotRef,
-  setshowCreateMeetingModal,
+  setShowCreateMeetingModal,
+  showCreateMeetingModal,
   setCurrentSlotRef,
+  setZoomMeetingData,
 }) => {
+  if (!showCreateMeetingModal) return;
+
   const slotStartDate = computeSlotStartDate(slotWeekDayNumber, currentSlotRef);
   const slotEndDate = computeSlotEndDate(slotStartDate, currentSlotRef);
-  const slotDuration = convertSlotHeightInPxToMin(currentSlotRef.current.style.height)
+  const slotDuration = convertSlotHeightInPxToMin(
+    currentSlotRef.current.style.height
+  );
 
   return (
-    <div className="modal-container">
-      <div className="modal">
-        <h2>Set up a meeting on Zoom</h2>
-        <div className="modal-body">
-          <h4>{`Starts at: ${slotStartDate}`}</h4>
-          <h4>{`Ends at: ${slotEndDate}`}</h4>
-        </div>
-        <div className="modal-button-container">
-          <button
-            className="modal-button"
-            onClick={async () => {
-              await createZoomMeeting(
-                slotStartDate,
-                slotDuration
-              );
-              setshowCreateMeetingModal(false);
-            }}
-          >
-            Confirm
-          </button>
-          <button
-            className="modal-button"
-            onClick={() => {
-              setshowCreateMeetingModal(false);
-              currentSlotRef.current.style.height = "0px";
-              setCurrentSlotRef(undefined);
-            }}
-          >
-            Cancel
-          </button>
-        </div>
+    <Modal title="Set up a meeting on Zoom">
+      <div className="modal-body">
+      <h4>Meeting scheduled:</h4>
+        <div>{`Starts at: ${formatToReadableDate(slotStartDate)}`}</div>
+        <div>{`Ends at: ${formatToReadableDate(slotEndDate)}`}</div>
       </div>
-    </div>
+      <ModalButtonGroup
+        onConfirm={async () => {
+          const zoomDataResponse = await createZoomMeeting(
+            slotStartDate,
+            slotDuration
+          );
+          setZoomMeetingData(zoomDataResponse);
+          setShowCreateMeetingModal(false);
+          currentSlotRef.current.style.background = MEETING_CONFIRMED_COLOUR;
+        }}
+        onCancel={() => {
+          setShowCreateMeetingModal(false);
+          currentSlotRef.current.style.height = '0px';
+          setCurrentSlotRef(undefined);
+        }}
+      />
+    </Modal>
   );
 };
 
