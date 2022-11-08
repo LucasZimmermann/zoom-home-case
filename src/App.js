@@ -138,12 +138,6 @@ function App() {
           onPointerMove={(e) => handleDrag(e)}
           onPointerUp={(e) => {
             setIsDragging(false);
-            console.log(
-              `Slot starting in minutes: ${currentSlotRef.current.offsetTop}`
-            );
-            console.log(
-              `Slot duration in minutes: ${currentSlotRef.current.style.height}`
-            );
             setShowModal(true);
           }}
           onPointerLeave={(e) => setIsDragging(false)}
