@@ -1,5 +1,12 @@
 # zoom-home-case
 
+Setup:
+
+```
+npm install
+npm start
+```
+
 Iterations:
 
 1) POC ([PR](https://github.com/LucasZimmermann/zoom-home-case/commit/45cd18e58acfdb263ca980a6090711bfb657878d))
