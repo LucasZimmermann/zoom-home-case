@@ -44,7 +44,7 @@ export const computeSlotStartDate = (slotWeekDayNumber, currentSlotRef) => {
 export const computeSlotEndDate = (slotStartDate, currentSlotRef) => {
   const endDate = new Date(slotStartDate);
   endDate.setMinutes(
-    convertSlotHeightInPxToMin(currentSlotRef.current.style.height)
+    endDate.getMinutes() + convertSlotHeightInPxToMin(currentSlotRef.current.style.height)
   );
 
   return endDate;
